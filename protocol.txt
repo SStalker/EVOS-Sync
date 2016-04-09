@@ -1,0 +1,46 @@
+The User needs to send a message to the server, which contains the session id,
+id of user id and the quiz id. The sync server checks if the user is the
+quiz's owner and that the quiz is active. The session will be saved in the
+session list. The Server will inform the User on success. All messages contain
+a field "type" which identifies the message.
+
+// A user starts a new quiz and registers it on the sync server.
+User -> Server
+{
+	type: 'start',
+	session_id: <SessionID>,
+	user_id: <UserID>,
+	quiz_id: <QuizID>
+}
+
+// After successfully registering a new quiz, the server informs the user.
+Server -> User
+{
+	type: 'accept'
+}
+
+// Attendee logs on a quiz.
+Attendee -> Server
+{
+	type: 'logon',
+	session_id: <SessionID>,
+	quiz_id: <QuizID>
+}
+
+// Server informs the attendee that he is logged on.
+Server -> Attendee
+{
+	type: 'accept'
+}
+
+// User starts a quiz or switches to the next question
+User -> Server
+{
+	type: 'next',
+	session_id: <SessionID>
+}
+
+Server -> Attendee
+{
+	type: 'next'
+}
