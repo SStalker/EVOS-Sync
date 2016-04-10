@@ -4,6 +4,29 @@ quiz's owner and that the quiz is active. The session will be saved in the
 session list. The Server will inform the User on success. All messages contain
 a field "type" which identifies the message.
 
+// Structure of the sessions array
+[
+	<QuizID> = {
+		session_id = <SessionId>,
+		attendees = [
+			<AttendeeWebSocketHandle>,
+			<AttendeeWebSocketHandle>,
+			<AttendeeWebSocketHandle>,
+			...
+		]
+	},
+	<QuizID> = {
+		session_id = <SessionId>,
+		attendees = [
+			<AttendeeWebSocketHandle>,
+			<AttendeeWebSocketHandle>,
+			<AttendeeWebSocketHandle>,
+			...
+		]
+	},
+	...
+]
+
 // A user starts a new quiz and registers it on the sync server.
 User -> Server
 {
@@ -37,10 +60,27 @@ Server -> Attendee
 User -> Server
 {
 	type: 'next',
+	quiz_id : <QuizID>,
 	session_id: <SessionID>
 }
 
+// The server informs the user to get the next question.
 Server -> Attendee
 {
 	type: 'next'
+}
+
+// The user ends the quiz session. This will delete the session
+// data on the sync server.
+User -> Server
+{
+	type: 'end',
+	quiz_id: <QuizId>,
+	session_id: <SessionID>
+}
+
+// Inform the attendees, that the quiz has ended.
+Server -> Attendee
+{
+	type: 'end'
 }
