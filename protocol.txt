@@ -8,6 +8,7 @@ a field "type" which identifies the message.
 [
     <QuizID> = {
         session_id = <SessionId>,
+        user_ws = <UserWebSocket>,
         attendees = [
             <AttendeeWebSocketHandle>,
             <AttendeeWebSocketHandle>,
@@ -17,6 +18,7 @@ a field "type" which identifies the message.
     },
     <QuizID> = {
         session_id = <SessionId>,
+        user_ws = <UserWebSocket>,
         attendees = [
             <AttendeeWebSocketHandle>,
             <AttendeeWebSocketHandle>,
@@ -31,7 +33,6 @@ a field "type" which identifies the message.
 User -> Server
 {
     type: 'start',
-    session_id: <SessionID>,
     user_id: <UserID>,
     quiz_id: <QuizID>
 }
@@ -39,7 +40,8 @@ User -> Server
 // After successfully registering a new quiz, the server informs the user.
 Server -> User
 {
-    type: 'accept'
+    type: 'start',
+    successful: true
 }
 
 // Attendee logs on a quiz.
@@ -47,13 +49,22 @@ Attendee -> Server
 {
     type: 'logon',
     session_id: <SessionID>,
-    quiz_id: <QuizID>
+    quiz_id: <QuizID>,
+    nickname: <Nickname>
 }
 
 // Server informs the attendee that he is logged on.
 Server -> Attendee
 {
-    type: 'accept'
+    type: 'logon',
+    successful: true
+}
+
+// Server informs User of new users
+Server -> User
+{
+    type: 'logon',
+    nickname: 'whatever'
 }
 
 // User starts a quiz or switches to the next question
