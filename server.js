@@ -8,6 +8,8 @@ var sessions = [];
 wss.on('connection', function(ws) {
     // Message recieved
     ws.on('message', function(message) {
+        console.log('recieved message');
+        console.log(message);
         message = JSON.parse(message);
         switch(message.type) {
             case 'start':
@@ -84,7 +86,7 @@ function logon(ws, message) {
     }
 
     // If not nickname was given, we assign a default one.
-    nickname = nickname || 'anon Alfred';
+    nickname = message.nickname || 'anon Alfred';
 
     if(session[message.quiz_id] === undefined) {
         sendResponse(ws, {
@@ -94,6 +96,9 @@ function logon(ws, message) {
         });
         return false;
     }
+
+    // Insert user's response socket to the sessions list
+    session[message.quiz_id].attendees.push(ws);
 
     // Infom Attendee
     sendResponse(ws, {
@@ -106,16 +111,6 @@ function logon(ws, message) {
         type: 'logon',
         nickname: nickname
     });
-}
-
-// Directly answer to the current client
-function sendResponse(ws, message) {
-    try {
-        ws.send(JSON.stringify(message));
-    } catch(e) {
-        console.log('Error while sending response:');
-        console.log(e);
-    }
 }
 
 // The server informs the user to get the next question after starting a quiz or switching to a new question
@@ -138,4 +133,14 @@ function question(ws, message){
 // Inform the attendees and user, that the quiz has ended.
 function end(ws, message){
     // ...
+}
+
+// Directly answer to the current client
+function sendResponse(ws, message) {
+    try {
+        ws.send(JSON.stringify(message));
+    } catch(e) {
+        console.log('Error while sending response:');
+        console.log(e);
+    }
 }
