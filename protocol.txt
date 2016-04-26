@@ -34,6 +34,7 @@ User -> Server
 {
     type: 'start',
     user_id: <UserID>,
+    session_id: <SessionID>,
     quiz_id: <QuizID>
 }
 
