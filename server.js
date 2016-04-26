@@ -88,7 +88,7 @@ function logon(ws, message) {
     // If not nickname was given, we assign a default one.
     nickname = message.nickname || 'anon Alfred';
 
-    if(session[message.quiz_id] === undefined) {
+    if(sessions[message.quiz_id] === undefined) {
         sendResponse(ws, {
             type: 'logon',
             successful: false,
@@ -98,7 +98,7 @@ function logon(ws, message) {
     }
 
     // Insert user's response socket to the sessions list
-    session[message.quiz_id].attendees.push(ws);
+    sessions[message.quiz_id].attendees.push(ws);
 
     // Infom Attendee
     sendResponse(ws, {
