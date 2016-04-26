@@ -64,13 +64,12 @@ Server -> Attendee
 Server -> User
 {
     type: 'logon',
-    nickname: 'whatever'
+    nickname: <nickname>
 }
 
-// User starts a quiz or switches to the next question
 User -> Server
 {
-    type: 'next',
+    type: 'question',
     quiz_id : <QuizID>,
     session_id: <SessionID>
 }
@@ -78,8 +77,18 @@ User -> Server
 // The server informs the user to get the next question.
 Server -> Attendee
 {
-    type: 'next'
+    type: 'question'
 }
+
+// Attendee sends answer to the server
+Attendee -> Server
+{
+    type: 'answer',
+    answer: <answer a, b, c, d>,
+    session_id: <SessionID>,
+    quiz_id : <QuizID>
+}
+
 
 // The user ends the quiz session. This will delete the session
 // data on the sync server.
@@ -95,3 +104,5 @@ Server -> Attendee
 {
     type: 'end'
 }
+
+

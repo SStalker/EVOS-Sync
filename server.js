@@ -6,6 +6,7 @@ var db = new Database();
 var sessions = [];
 
 wss.on('connection', function(ws) {
+    // Message recieved
     ws.on('message', function(message) {
         message = JSON.parse(message);
         switch(message.type) {
@@ -14,6 +15,13 @@ wss.on('connection', function(ws) {
                 break;
             case 'logon':
                 logon(ws, message);
+                break;
+            case 'question':
+                next(ws, message);
+                break;
+            case 'end':
+                end(ws, message);
+                break;
             default:
                 console.log('Received an invalid message.');
         }
@@ -76,7 +84,7 @@ function logon(ws, message) {
     }
 
     // If not nickname was given, we assign a default one.
-    nickname = nickname || 'anon Alfred;
+    nickname = nickname || 'anon Alfred';
 
     if(session[message.quiz_id] === undefined) {
         sendResponse(ws, {
@@ -108,4 +116,26 @@ function sendResponse(ws, message) {
         console.log('Error while sending response:');
         console.log(e);
     }
+}
+
+// The server informs the user to get the next question after starting a quiz or switching to a new question
+function question(ws, message){
+    // Check if the message contains the required data
+    if(message.quiz_id === undefined || message.session_id === undefined) {
+        console.log('Invalid question message:');
+        console.log(message);
+        sendResponse(ws, {
+            type: 'question',
+            successful: false,
+            reason: 'message is invalid'
+        });
+        return false;
+    }
+
+    // ...
+}
+
+// Inform the attendees and user, that the quiz has ended.
+function end(ws, message){
+    // ...
 }
