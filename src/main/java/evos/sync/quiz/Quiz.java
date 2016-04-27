@@ -31,7 +31,7 @@ public interface Quiz {
      *
      * @return User's session string
      */
-    public String getUserSession();
+    public String getUserSessionString();
 
     /**
      * Returns the WebSocket session of the user. It's required to send the User

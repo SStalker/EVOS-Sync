@@ -26,8 +26,18 @@ import javax.websocket.Session;
  */
 public class BaseQuiz implements Quiz {
 
+    private int quizId;
+    private Session userSession;
+    private String userSessionString;
+    private List<Session> attendeeList;
+    
+    public BaseQuiz(int quizId, Session userSession) {
+        this.quizId = quizId;
+        this.userSession = userSession;
+    }
+
     @Override
-    public String getUserSession() {
+    public String getUserSessionString() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
