@@ -6,26 +6,14 @@ a field "type" which identifies the message.
 
 // Structure of the sessions array
 [
-    <QuizID> = {
-        session_id = <SessionId>,
-        user_ws = <UserWebSocket>,
-        attendees = [
-            <AttendeeWebSocketHandle>,
-            <AttendeeWebSocketHandle>,
-            <AttendeeWebSocketHandle>,
-            ...
-        ]
-    },
-    <QuizID> = {
-        session_id = <SessionId>,
-        user_ws = <UserWebSocket>,
-        attendees = [
-            <AttendeeWebSocketHandle>,
-            <AttendeeWebSocketHandle>,
-            <AttendeeWebSocketHandle>,
-            ...
-        ]
-    },
+    <QuizID> = Quiz(<QuizId>,
+                    <SessionString>,
+                    <UserSession>,
+                    <AttendeeList>),
+    <QuizID> = Quiz(<QuizId>,
+                    <SessionString>,
+                    <UserSession>,
+                    <AttendeeList>),
     ...
 ]
 
