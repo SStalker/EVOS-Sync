@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script>
+            document.addEventListener("DOMContentLoaded", function(event) {
+                var ws = new WebSocket('ws://localhost:8080/EVOS-Sync/sync');
+                
+                ws.onopen = function() {
+                    console.log('Opened connection');
+                };
+                
+                ws.onclose = function() {
+                    console.log('Closed connection');
+                };
+                
+                ws.onerror = function() {
+                    console.log('An error occurred');
+                };
+                
+                ws.onopen = function(msg) {
+                    console.log('Received message:');
+                    console.log(msg);
+                };
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+    </body>
+</html>
