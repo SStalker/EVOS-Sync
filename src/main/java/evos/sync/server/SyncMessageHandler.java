@@ -16,18 +16,89 @@
  */
 package evos.sync.server;
 
-import evos.sync.quiz.QuizList;
+import evos.sync.database.Database;
+import evos.sync.quiz.QuizManager;
+import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
 
 /**
  * This class handles the request for each session.
  *
  * @author Christian Wansart
  */
-public class SyncMessageHandler {
-    
+public class SyncMessageHandler implements MessageHandler.Whole<String> {
+
     @Inject
-    private QuizList quizList;
-    
-    
+    private QuizManager quizManager;
+    private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
+    private Session userSession;
+
+    public SyncMessageHandler(Session session) {
+        this.userSession = session;
+    }
+
+    @Override
+    public void onMessage(String message) {
+        JsonObject jsonMessage = Json.createReader(new StringReader(message)).readObject();
+        String messageType = jsonMessage.getString("type");
+
+        // The messageType is null, if type was not in the message.
+        if (messageType == null) {
+            messageType = "";
+        }
+
+        switch (messageType) {
+            case "start":
+                handleStart(jsonMessage);
+                break;
+            default:
+        }
+    }
+
+    /**
+     * Handles the start message type.
+     *
+     * User -> Server { type: 'start', user_id: <UserID>, session_id:
+     * <SessionID>, quiz_id: <QuizID> }
+     *
+     * @param jsonMessage the message.
+     */
+    private void handleStart(JsonObject message) {
+        int userId;
+        int quizId;
+        String sessionString;
+
+        try {
+            userId = message.getInt("user_id");
+            quizId = message.getInt("quiz_id");
+            sessionString = message.getString("session_id");
+        } catch (NullPointerException ex) {
+            String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("start", msg));
+            return;
+        }
+
+        quizManager.startQuiz(quizId, sessionString, userSession);
+    }
+
+    /**
+     * Sends a message to the current client.
+     *
+     * @param message the message that should be sent to the client.
+     */
+    private void sendResponse(String message) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String createErrorString(String type, String reason) {
+        return "{type: '" + type + "', successfull: false, reason: '" + reason + "'}";
+    }
+
 }

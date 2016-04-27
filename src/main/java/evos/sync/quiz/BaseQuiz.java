@@ -30,10 +30,21 @@ public class BaseQuiz implements Quiz {
     private Session userSession;
     private String userSessionString;
     private List<Session> attendeeList;
-    
-    public BaseQuiz(int quizId, Session userSession) {
+
+    public BaseQuiz(int quizId, String userSessionString, Session userSession) {
         this.quizId = quizId;
         this.userSession = userSession;
+        this.userSessionString = userSessionString;
+    }
+
+    /**
+     * Returns the id of the Quiz.
+     *
+     * @return Quiz's id
+     */
+    @Override
+    public int getId() {
+        return quizId;
     }
 
     @Override

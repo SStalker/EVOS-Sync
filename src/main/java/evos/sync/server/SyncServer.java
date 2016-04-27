@@ -32,7 +32,7 @@ public class SyncServer {
     public void onOpen(Session session) {
         System.out.println("Opened session: " + session.getId());
 
-        SyncMessageHandler messageHandler = new SyncMessageHandler();
+        SyncMessageHandler messageHandler = new SyncMessageHandler(session);
     }
 
 }

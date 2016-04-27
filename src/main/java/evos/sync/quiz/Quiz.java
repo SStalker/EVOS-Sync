@@ -27,6 +27,13 @@ import javax.websocket.Session;
 public interface Quiz {
 
     /**
+     * Returns the Quiz's id.
+     *
+     * @return Quiz id
+     */
+    public int getId();
+
+    /**
      * Returns User's (professor) session string.
      *
      * @return User's session string

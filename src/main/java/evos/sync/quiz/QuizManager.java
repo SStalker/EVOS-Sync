@@ -16,16 +16,41 @@
  */
 package evos.sync.quiz;
 
+import evos.sync.database.Database;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.websocket.Session;
 
 /**
  * This class manages the active quizzes.
- * 
+ *
  * @author Christian Wansart
  */
 @Singleton
 public class QuizManager {
-    
-    private List<Quiz> activeQuizzes;
+
+    /**
+     * Contains the active quizzes. The keys are the ids of the quiz. There
+     * should always be just one quiz with the same id.
+     */
+    private Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
+
+    @Inject
+    private Database database;
+
+    /**
+     * Starts a quiz with the given quizId of the User with the given userId.
+     * 
+     * @param quizId the id of the Quiz
+     * @param sessionString the session string of the User (for auth reasons)
+     * @param userSession Session object of the User/owner of the Quiz
+     */
+    public void startQuiz(int quizId, String sessionString, Session userSession) {
+        Quiz quiz = new BaseQuiz(quizId, sessionString, userSession);
+        activeQuizzes.put(quizId, quiz);
+    }
 }
