@@ -25,7 +25,7 @@ import javax.inject.Singleton;
  * @author Christian Wansart
  */
 @Singleton
-public class QuizList {
+public class QuizManager {
     
     private List<Quiz> activeQuizzes;
 }
