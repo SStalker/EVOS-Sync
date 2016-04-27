@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with EVOS-Sync.  If not, see <http://www.gnu.org/licenses/>.
  */
-package evos.sync;
+package evos.sync.database;
 
 import java.io.IOException;
 import java.io.InputStream;
