@@ -35,15 +35,16 @@ import javax.inject.Singleton;
 public class Database {
     
     private Connection connection;
+    private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
     
     public Database() {
         Properties databaseProperties = new Properties();
         try (InputStream databasePropertiesStream = this.getClass().getResourceAsStream("/database.properties")) {
             databaseProperties.load(databasePropertiesStream);
             
-            Logger.getLogger(Database.class.getName()).log(Level.INFO, "Successfully loaded database.properties file");
+            LOGGER.log(Level.INFO, "Successfully loaded database.properties file");
         } catch (NullPointerException | IOException ex) {
-            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             return;
         }
         
@@ -56,9 +57,9 @@ public class Database {
                     + "&useSSL=false&serverTimezone=" + databaseProperties.getProperty("timezone");
             connection = DriverManager.getConnection(connectionString);
             
-            Logger.getLogger(Database.class.getName()).log(Level.INFO, "Successfully loaded database");
+            LOGGER.log(Level.INFO, "Successfully loaded database");
         } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 }
