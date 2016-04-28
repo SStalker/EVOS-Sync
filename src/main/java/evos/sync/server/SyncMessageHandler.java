@@ -18,12 +18,14 @@ package evos.sync.server;
 
 import evos.sync.database.Database;
 import evos.sync.quiz.QuizManager;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
@@ -85,7 +87,20 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             return;
         }
 
-        quizManager.startQuiz(quizId, sessionString, userSession);
+        try {
+            quizManager.startQuiz(quizId, userId, sessionString, userSession);
+        } catch (IllegalArgumentException ex) {
+            String msg = "user is not owner of quiz";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("start", msg));
+            return;
+        }
+
+        // So far so good, now we need to inform the User
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("type", true);
+        response.add("successful", true);
+        sendResponse(response.build().toString());
     }
 
     /**
@@ -94,11 +109,19 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
      * @param message the message that should be sent to the client.
      */
     private void sendResponse(String message) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            userSession.getBasicRemote().sendText(message);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Could not send response to User!");
+        }
     }
 
     private String createErrorString(String type, String reason) {
-        return "{type: '" + type + "', successfull: false, reason: '" + reason + "'}";
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("type", type);
+        response.add("successful", false);
+        response.add("reason", reason);
+        return response.build().toString();
     }
 
 }

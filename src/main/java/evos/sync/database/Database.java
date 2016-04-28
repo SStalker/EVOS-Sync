@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,21 +36,21 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class Database {
-    
+
     private Connection connection;
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
-    
+
     public Database() {
         Properties databaseProperties = new Properties();
         try (InputStream databasePropertiesStream = this.getClass().getResourceAsStream("/database.properties")) {
             databaseProperties.load(databasePropertiesStream);
-            
+
             LOGGER.log(Level.INFO, "Successfully loaded database.properties file");
         } catch (NullPointerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return;
         }
-        
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             String connectionString = "jdbc:mysql://" + databaseProperties.getProperty("host")
@@ -56,10 +59,35 @@ public class Database {
                     + "&password=" + databaseProperties.getProperty("password")
                     + "&useSSL=false&serverTimezone=" + databaseProperties.getProperty("timezone");
             connection = DriverManager.getConnection(connectionString);
-            
+
             LOGGER.log(Level.INFO, "Successfully loaded database");
         } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
+    }
+
+    public boolean isOwner(int quizId, int userId) {
+        String sql = "SELECT users.name"
+                + " FROM quizzes, categories, users"
+                + " WHERE quizzes.category_id = categories.id"
+                + " AND categories.user_id = users.id"
+                + " AND users.id = ?"
+                + " AND quizzes.id = ?";
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            statement.setInt(2, quizId);
+            ResultSet resultSet = statement.executeQuery();
+            
+            // first() returns true if the cursor is on a valid ResultSet.
+            // It returns false if there are no rows in the ResultSet.
+            // TODO: Write unit test to test this
+            return resultSet.first();
+        } catch (SQLException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;
     }
 }

@@ -16,6 +16,8 @@
  */
 package evos.sync.quiz;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.websocket.Session;
 
@@ -26,15 +28,20 @@ import javax.websocket.Session;
  */
 public class BaseQuiz implements Quiz {
 
-    private int quizId;
+    /*
+     * TODO: We may need to create setters for userSession and the
+     * userSessionString, if the User has a disconnection.
+     */
+    private final int quizId;
     private Session userSession;
     private String userSessionString;
-    private List<Session> attendeeList;
+    private final List<Session> attendeeList;
 
     public BaseQuiz(int quizId, String userSessionString, Session userSession) {
         this.quizId = quizId;
         this.userSession = userSession;
         this.userSessionString = userSessionString;
+        this.attendeeList = Collections.synchronizedList(new ArrayList<Session>());
     }
 
     /**
@@ -47,16 +54,32 @@ public class BaseQuiz implements Quiz {
         return quizId;
     }
 
+    /**
+     * Returns User's (professor) session string.
+     *
+     * @return User's session string
+     */
     @Override
     public String getUserSessionString() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Returns the WebSocket session of the user. It's required to send the User
+     * messages.
+     *
+     * @return User's Session
+     */
     @Override
     public Session getSession() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Returns the attendee list that logged on to the quiz.
+     *
+     * @return Attendee list
+     */
     @Override
     public List<Session> getAttendeeList() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

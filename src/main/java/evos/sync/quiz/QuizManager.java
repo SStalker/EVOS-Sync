@@ -46,11 +46,19 @@ public class QuizManager {
      * Starts a quiz with the given quizId of the User with the given userId.
      * 
      * @param quizId the id of the Quiz
+     * @param userId the id of the User
      * @param sessionString the session string of the User (for auth reasons)
      * @param userSession Session object of the User/owner of the Quiz
+     * @throws IllegalArgumentException when the User is not the Owner of the Quiz
      */
-    public void startQuiz(int quizId, String sessionString, Session userSession) {
+    public void startQuiz(int quizId, int userId, String sessionString, Session userSession) throws IllegalArgumentException{
         Quiz quiz = new BaseQuiz(quizId, sessionString, userSession);
+        
+        // Check if User is owner of Quiz
+        if(!database.isOwner(quizId, userId)) {
+            throw new IllegalArgumentException("User is not owner of Quiz");
+        }
+        
         activeQuizzes.put(quizId, quiz);
     }
 }
