@@ -54,4 +54,11 @@ public interface Quiz {
      * @return Attendee list
      */
     public List<Session> getAttendeeList();
+
+    /**
+     * Adds an Attendee's session to attendee list.
+     *
+     * @param attendeeSession Attendee's Session
+     */
+    public void addAttendee(Session attendeeSession);
 }

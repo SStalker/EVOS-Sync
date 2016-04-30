@@ -85,4 +85,14 @@ public class BaseQuiz implements Quiz {
         return this.attendeeList;
     }
 
+    /**
+     * Adds an Attendee's session to attendee list.
+     *
+     * @param attendeeSession Attendee's Session
+     */
+    @Override
+    public void addAttendee(Session attendeeSession) {
+        attendeeList.add(attendeeSession);
+    }
+
 }

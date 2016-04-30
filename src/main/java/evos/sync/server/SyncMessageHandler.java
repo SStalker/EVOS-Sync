@@ -17,9 +17,11 @@
 package evos.sync.server;
 
 import evos.sync.database.Database;
+import evos.sync.quiz.Quiz;
 import evos.sync.quiz.QuizManager;
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -74,7 +76,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
      * User -> Server { type: 'start', user_id: <UserID>, session_id:
      * <SessionID>, quiz_id: <QuizID> }
      *
-     * @param jsonMessage the message.
+     * @param message the message.
      */
     private void handleStart(JsonObject message) {
         int userId;
@@ -106,6 +108,58 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         response.add("type", true);
         response.add("successful", true);
         sendResponse(response.build().toString());
+    }
+
+    /**
+     * Handles incoming logon messages from Attendees. Attendees can only logon
+     * to running quizzes.
+     *
+     * Attendee -> Server { type: 'logon', session_id: <SessionID>, quiz_id:
+     * <QuizID>, nickname: <Nickname> }
+     *
+     * @param message incoming message
+     */
+    private void handleLogon(JsonObject message) {
+        int quizId;
+        String nickname;
+
+        try {
+            quizId = message.getInt("quiz_id");
+            nickname = message.getString("nickname");
+        } catch (NullPointerException ex) {
+            String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("logon", msg));
+            return;
+        }
+
+        Quiz quiz;
+        try {
+            quizManager.signUp(quizId, nickname, this.userSession);
+            quiz = quizManager.getQuiz(quizId);
+        } catch (IllegalArgumentException ex) {
+            String msg = "quiz is not active";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("logon", msg));
+            return;
+        }
+
+        // Inform Attendee about successful logon
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("type", "logon");
+        response.add("successful", true);
+        sendResponse(response.build().toString());
+
+        // Inform User about new Attendee
+        Session userSession = quiz.getSession();
+        response = Json.createObjectBuilder();
+        response.add("type", "logon");
+        response.add("nickname", nickname);
+        try {
+            userSession.getBasicRemote().sendText(response.build().toString());
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Could not send response to User!");
+        }
     }
 
     /**

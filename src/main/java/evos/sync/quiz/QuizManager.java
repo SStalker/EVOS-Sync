@@ -43,21 +43,50 @@ public class QuizManager {
 
     /**
      * Starts a quiz with the given quizId of the User with the given userId.
-     * 
+     *
      * @param quizId the id of the Quiz
      * @param userId the id of the User
      * @param sessionString the session string of the User (for auth reasons)
      * @param userSession Session object of the User/owner of the Quiz
-     * @throws IllegalArgumentException when the User is not the Owner of the Quiz
+     * @throws IllegalArgumentException when the User is not the Owner of the
+     * Quiz
      */
-    public void startQuiz(int quizId, int userId, String sessionString, Session userSession) throws IllegalArgumentException{
+    public void startQuiz(int quizId, int userId, String sessionString, Session userSession) throws IllegalArgumentException {
         Quiz quiz = new BaseQuiz(quizId, sessionString, userSession);
-        
+
         // Check if User is owner of Quiz
-        if(!database.isOwner(quizId, userId)) {
+        if (!database.isOwner(quizId, userId)) {
             throw new IllegalArgumentException("User is not owner of Quiz");
         }
-        
+
         activeQuizzes.put(quizId, quiz);
+    }
+
+    /**
+     * Signs up an Attendee to an active Quiz.
+     *
+     * @param quizId Quiz's id
+     * @param nickname Attendee's nickname
+     * @param attendeeSession Attendees Session
+     * @throws IllegalArgumentException if the given Quiz is not active
+     */
+    public void signUp(int quizId, String nickname, Session attendeeSession) throws IllegalArgumentException {
+        Quiz quiz = activeQuizzes.get(quizId);
+
+        if (quiz == null) {
+            throw new IllegalArgumentException("given Quiz is not active");
+        }
+
+        quiz.addAttendee(attendeeSession);
+    }
+
+    public Quiz getQuiz(int quizId) {
+        Quiz quiz = activeQuizzes.get(quizId);
+        
+        if(quiz == null) {
+            throw new IllegalArgumentException("quiz is not active");
+        }
+        
+        return quiz;
     }
 }
