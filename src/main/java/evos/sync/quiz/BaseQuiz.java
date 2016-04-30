@@ -61,7 +61,7 @@ public class BaseQuiz implements Quiz {
      */
     @Override
     public String getUserSessionString() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.userSessionString;
     }
 
     /**
@@ -72,7 +72,7 @@ public class BaseQuiz implements Quiz {
      */
     @Override
     public Session getSession() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.userSession;
     }
 
     /**
@@ -82,7 +82,7 @@ public class BaseQuiz implements Quiz {
      */
     @Override
     public List<Session> getAttendeeList() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.attendeeList;
     }
 
 }
