@@ -19,7 +19,6 @@ package evos.sync.quiz;
 import evos.sync.database.Database;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,7 +36,7 @@ public class QuizManager {
      * Contains the active quizzes. The keys are the ids of the quiz. There
      * should always be just one quiz with the same id.
      */
-    private Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
+    private final Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
 
     @Inject
     private Database database;
