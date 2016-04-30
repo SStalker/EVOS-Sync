@@ -45,6 +45,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         this.userSession = session;
     }
 
+    /**
+     * Gets invoked when the server receives a message.
+     *
+     * @param message JSON formatted message
+     */
     @Override
     public void onMessage(String message) {
         JsonObject jsonMessage = Json.createReader(new StringReader(message)).readObject();
@@ -116,6 +121,13 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         }
     }
 
+    /**
+     * Creates an JSON formatted error string.
+     *
+     * @param type message type
+     * @param reason error reason (short description)
+     * @return error string
+     */
     private String createErrorString(String type, String reason) {
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add("type", type);
