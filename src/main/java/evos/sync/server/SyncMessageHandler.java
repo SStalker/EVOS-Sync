@@ -22,6 +22,7 @@ import evos.sync.quiz.QuizManager;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -67,7 +68,9 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
                 handleStart(jsonMessage);
                 break;
             case "logon":
-                handleLogon(jsonMessage);                
+                handleLogon(jsonMessage);
+            case "question":
+                handleQuestion(jsonMessage);
             default:
                 LOGGER.log(Level.WARNING, "Received an message without a type");
         }
@@ -162,6 +165,61 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             userSession.getBasicRemote().sendText(response.build().toString());
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Could not send response to User!");
+        }
+    }
+
+    /**
+     * Informs the Attendees to request a new question.
+     *
+     * User -> Server { type: 'question', quiz_id : <QuizID>, session_id:
+     * <SessionID> }
+     *
+     * @param message json formatted message
+     */
+    private void handleQuestion(JsonObject message) {
+        int quizId;
+        String userSessionString;
+
+        try {
+            quizId = message.getInt("quiz_id");
+            userSessionString = message.getString("session_id");
+        } catch (NullPointerException ex) {
+            String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("question", msg));
+            return;
+        }
+
+        Quiz quiz;
+        try {
+            quiz = quizManager.getQuiz(quizId);
+        } catch (IllegalArgumentException ex) {
+            String msg = "quiz is not active";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("question", msg));
+            return;
+        }
+
+        if (!quiz.getUserSessionString().equals(userSessionString)) {
+            String msg = "you are not the quiz owner";
+            LOGGER.log(Level.WARNING, msg);
+            sendResponse(createErrorString("question", msg));
+            return;
+        }
+
+        List<Session> attendees = quiz.getAttendeeList();
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("type", "question");
+        String responseString = response.build().toString();
+        synchronized (attendees) {
+            for (Session attendee : attendees) {
+                try {
+                    attendee.getBasicRemote().sendText(responseString);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.SEVERE, "Could not send response to Attendee!");
+                    // TODO: Perhaps we should inform the User about this failure?
+                }
+            }
         }
     }
 
