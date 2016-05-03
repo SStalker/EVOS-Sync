@@ -61,14 +61,21 @@ public class QuizManager {
 
         activeQuizzes.put(quizId, quiz);
     }
-    
-    public void endQuiz(int quizId, String sessionString, Session userSession) throws IllegalArgumentException {
+
+    /**
+     * Ends an active Quiz.
+     *
+     * @param quizId Quiz's id
+     * @param sessionString User's session string for authentication
+     * @throws IllegalArgumentException will be thrown if the Quiz is not active
+     */
+    public void endQuiz(int quizId, String sessionString) throws IllegalArgumentException {
         Quiz quiz = getQuiz(quizId);
-        
-        if(!quiz.getUserSessionString().equals(sessionString)) {
+
+        if (!quiz.getUserSessionString().equals(sessionString)) {
             throw new IllegalArgumentException("User is not owner of Quiz");
         }
-        
+
         this.activeQuizzes.remove(quizId);
     }
 

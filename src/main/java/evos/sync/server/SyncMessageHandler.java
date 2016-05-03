@@ -326,7 +326,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         }
         
         // now we remote the Quiz fro the QuizManager
-        quizManager.endQuiz(quizId, sessionString, userSession);
+        quizManager.endQuiz(quizId, sessionString);
         sendResponse(response.build().toString());
     }
 
