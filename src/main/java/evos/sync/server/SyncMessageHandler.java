@@ -21,7 +21,6 @@ import evos.sync.quiz.Quiz;
 import evos.sync.quiz.QuizManager;
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
