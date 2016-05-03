@@ -23,7 +23,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,7 +78,7 @@ public class Database {
             statement.setInt(1, userId);
             statement.setInt(2, quizId);
             ResultSet resultSet = statement.executeQuery();
-            
+
             // first() returns true if the cursor is on a valid ResultSet.
             // It returns false if there are no rows in the ResultSet.
             // TODO: Write unit test to test this
