@@ -81,6 +81,8 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             case "answer":
                 handleAnswer(jsonMessage);
                 break;
+            case "end":
+                handleEnd(jsonMessage);
             default:
                 LOGGER.log(Level.WARNING, "Received an message without a type");
         }
@@ -273,6 +275,59 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Could not send response to User!");
         }
+    }
+
+    /**
+     * Handles the "end" message type.
+     *
+     * @param message JSON formatted message
+     */
+    private void handleEnd(JsonObject message) {
+        int quizId;
+        String sessionString;
+
+        try {
+            quizId = message.getInt("quiz_id");
+            sessionString = message.getString("session_id");
+        } catch (NullPointerException ex) {
+            String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("end", msg));
+            return;
+        }
+
+        Quiz quiz;
+        try {
+            quiz = quizManager.getQuiz(quizId);
+        } catch (IllegalArgumentException ex) {
+            String msg = ex.getMessage();
+            LOGGER.warning(msg);
+            sendResponse(createErrorString("end", msg));
+            return;
+        }
+
+        if (!quiz.getUserSessionString().equals(sessionString)) {
+            String msg = "user is not owner of quiz";
+            LOGGER.warning(msg);
+            sendResponse(createErrorString("end", msg));
+            return;
+        }
+
+        // now we need to inform the Attendees
+        List<Session> attendees = quiz.getAttendeeList();
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("type", "end");
+        for (Session attendee : attendees) {
+            try {
+                attendee.getBasicRemote().sendText(response.build().toString());
+            } catch (IOException ex) {
+                Logger.getLogger(SyncMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        // now we remote the Quiz fro the QuizManager
+        quizManager.endQuiz(quizId, sessionString, userSession);
+        sendResponse(response.build().toString());
     }
 
     /**

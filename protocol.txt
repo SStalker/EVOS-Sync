@@ -98,4 +98,8 @@ Server -> Attendee
     type: 'end'
 }
 
-
+// To inform the User that the Quiz was successfully closed
+Server -> User
+{
+    type: 'end'
+}

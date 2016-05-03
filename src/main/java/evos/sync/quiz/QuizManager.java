@@ -61,6 +61,16 @@ public class QuizManager {
 
         activeQuizzes.put(quizId, quiz);
     }
+    
+    public void endQuiz(int quizId, String sessionString, Session userSession) throws IllegalArgumentException {
+        Quiz quiz = getQuiz(quizId);
+        
+        if(!quiz.getUserSessionString().equals(sessionString)) {
+            throw new IllegalArgumentException("User is not owner of Quiz");
+        }
+        
+        this.activeQuizzes.remove(quizId);
+    }
 
     /**
      * Signs up an Attendee to an active Quiz.
@@ -80,7 +90,7 @@ public class QuizManager {
         quiz.addAttendee(attendeeSession);
     }
 
-    public Quiz getQuiz(int quizId) {
+    public Quiz getQuiz(int quizId) throws IllegalArgumentException {
         Quiz quiz = activeQuizzes.get(quizId);
 
         if (quiz == null) {
