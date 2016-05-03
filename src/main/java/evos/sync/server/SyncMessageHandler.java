@@ -69,8 +69,13 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
                 break;
             case "logon":
                 handleLogon(jsonMessage);
+                break;
             case "question":
                 handleQuestion(jsonMessage);
+                break;
+            case "answer":
+                handleAnswer(jsonMessage);
+                break;
             default:
                 LOGGER.log(Level.WARNING, "Received an message without a type");
         }
@@ -220,6 +225,29 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
                     // TODO: Perhaps we should inform the User about this failure?
                 }
             }
+        }
+    }
+
+    /**
+     * Handles the received answers.
+     *
+     * Attendee -> Server { type: 'answer', answer: <answer a, b, c, d>,
+     * session_id: <SessionID>, quiz_id : <QuizID> }
+     *
+     * @param message JSON formatted message
+     */
+    private void handleAnswer(JsonObject message) {
+        int quizId;
+        String answer;
+
+        try {
+            quizId = message.getInt("quiz_id");
+            answer = message.getString("answer");
+        } catch (NullPointerException ex) {
+            String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("answer", msg));
+            return;
         }
     }
 
