@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.websocket.MessageHandler;
@@ -242,16 +243,35 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
      */
     private void handleAnswer(JsonObject message) {
         int quizId;
-        String answer;
+        JsonArray answer;
 
         try {
             quizId = message.getInt("quiz_id");
-            answer = message.getString("answer");
+            answer = message.getJsonArray("answer");
         } catch (NullPointerException ex) {
             String msg = "missing parameters in message";
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("answer", msg));
             return;
+        }
+
+        Quiz quiz;
+        try {
+            quiz = quizManager.getQuiz(quizId);
+        } catch (IllegalArgumentException ex) {
+            String msg = "quiz is not active";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("answer", msg));
+            return;
+        }
+
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        response.add("type", "answer");
+        response.add("answer", answer);
+        try {
+            quiz.getSession().getBasicRemote().sendText(response.build().toString());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Could not send response to User!");
         }
     }
 

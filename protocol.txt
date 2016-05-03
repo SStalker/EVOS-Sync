@@ -79,8 +79,7 @@ Attendee -> Server
 Server -> User
 {
     type: 'answer',
-    answer: <answer a, b, c, d>,
-    quiz_id: <QuizID>
+    answer: <answer a, b, c, d>
 }
 
 
