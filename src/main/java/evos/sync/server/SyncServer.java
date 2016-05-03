@@ -16,6 +16,7 @@
  */
 package evos.sync.server;
 
+import javax.inject.Inject;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnOpen;
@@ -29,12 +30,17 @@ import javax.websocket.server.ServerEndpoint;
  */
 @ServerEndpoint("/sync")
 public class SyncServer {
+    
+    @Inject
+    private SyncMessageHandlerFactory syncMessageHandlerFactory;
 
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("Opened session: " + session.getId());
+        
+        System.out.println("HANDLER: " + syncMessageHandlerFactory);
 
-        SyncMessageHandler messageHandler = new SyncMessageHandler(session);
+        SyncMessageHandler messageHandler = syncMessageHandlerFactory.createSyncMessageHandler(session);
         session.addMessageHandler(messageHandler);
     }
 

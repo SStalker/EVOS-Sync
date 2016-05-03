@@ -39,7 +39,7 @@ public class QuizManager {
      */
     private final Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
 
-    //@Inject
+    @Inject
     private Database database = new Database();
 
     /**
@@ -83,11 +83,11 @@ public class QuizManager {
 
     public Quiz getQuiz(int quizId) {
         Quiz quiz = activeQuizzes.get(quizId);
-        
-        if(quiz == null) {
+
+        if (quiz == null) {
             throw new IllegalArgumentException("quiz is not active");
         }
-        
+
         return quiz;
     }
 }

@@ -39,13 +39,17 @@ import javax.websocket.Session;
  */
 public class SyncMessageHandler implements MessageHandler.Whole<String> {
 
-    //@Inject
-    private QuizManager quizManager = new QuizManager();
+    @Inject
+    private QuizManager quizManager;
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
     private Session userSession;
 
-    public SyncMessageHandler(Session session) {
+    @Inject
+    public SyncMessageHandler(Session session, QuizManager quizManager) {
         this.userSession = session;
+        this.quizManager = quizManager;
+
+        System.out.println("QuizManager: " + quizManager);
     }
 
     /**
@@ -59,11 +63,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         String messageType = "";
         try {
             messageType = jsonMessage.getString("type");
-        } catch(NullPointerException ex) {
+        } catch (NullPointerException ex) {
             LOGGER.warning("missing type");
-            
+
         }
-        
+
         switch (messageType) {
             case "start":
                 handleStart(jsonMessage);
