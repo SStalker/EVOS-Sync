@@ -117,7 +117,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
 
         // So far so good, now we need to inform the User
         JsonObjectBuilder response = Json.createObjectBuilder();
-        response.add("type", true);
+        response.add("type", "start");
         response.add("successful", true);
         sendResponse(response.build().toString());
     }
