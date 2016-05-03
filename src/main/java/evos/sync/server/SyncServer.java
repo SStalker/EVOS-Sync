@@ -16,6 +16,8 @@
  */
 package evos.sync.server;
 
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -33,6 +35,18 @@ public class SyncServer {
         System.out.println("Opened session: " + session.getId());
 
         SyncMessageHandler messageHandler = new SyncMessageHandler(session);
+        session.addMessageHandler(messageHandler);
+    }
+
+    @OnClose
+    public void onClose(Session session) {
+        System.out.println("Closed Session:" + session.getId());
+    }
+
+    @OnError
+    public void onError(Throwable t) {
+        System.err.println("An error occurred: " + t.getMessage());
+        t.printStackTrace();
     }
 
 }

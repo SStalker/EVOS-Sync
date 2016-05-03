@@ -39,8 +39,8 @@ import javax.websocket.Session;
  */
 public class SyncMessageHandler implements MessageHandler.Whole<String> {
 
-    @Inject
-    private QuizManager quizManager;
+    //@Inject
+    private QuizManager quizManager = new QuizManager();
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
     private Session userSession;
 
@@ -56,13 +56,14 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
     @Override
     public void onMessage(String message) {
         JsonObject jsonMessage = Json.createReader(new StringReader(message)).readObject();
-        String messageType = jsonMessage.getString("type");
-
-        // The messageType is null, if type was not in the message.
-        if (messageType == null) {
-            messageType = "";
+        String messageType = "";
+        try {
+            messageType = jsonMessage.getString("type");
+        } catch(NullPointerException ex) {
+            LOGGER.warning("missing type");
+            
         }
-
+        
         switch (messageType) {
             case "start":
                 handleStart(jsonMessage);

@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.websocket.Session;
 
@@ -38,8 +39,8 @@ public class QuizManager {
      */
     private final Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
 
-    @Inject
-    private Database database;
+    //@Inject
+    private Database database = new Database();
 
     /**
      * Starts a quiz with the given quizId of the User with the given userId.

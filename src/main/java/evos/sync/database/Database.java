@@ -52,7 +52,7 @@ public class Database {
         }
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
             String connectionString = "jdbc:mysql://" + databaseProperties.getProperty("host")
                     + ":" + databaseProperties.getProperty("port")
                     + "/evos?user=" + databaseProperties.getProperty("user") + ""
