@@ -37,7 +37,6 @@ Server -> User
 Attendee -> Server
 {
     type: 'logon',
-    session_id: <SessionID>,
     quiz_id: <QuizID>,
     nickname: <Nickname>
 }
@@ -74,8 +73,14 @@ Attendee -> Server
 {
     type: 'answer',
     answer: <answer a, b, c, d>,
-    session_id: <SessionID>,
     quiz_id : <QuizID>
+}
+
+Server -> User
+{
+    type: 'answer',
+    answer: <answer a, b, c, d>,
+    quiz_id: <QuizID>
 }
 
 
