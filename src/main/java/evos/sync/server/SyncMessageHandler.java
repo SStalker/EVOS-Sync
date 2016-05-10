@@ -44,7 +44,6 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
     private Session userSession;
 
-    @Inject
     public SyncMessageHandler(Session session, QuizManager quizManager) {
         this.userSession = session;
         this.quizManager = quizManager;
