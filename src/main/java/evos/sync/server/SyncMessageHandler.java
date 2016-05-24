@@ -82,6 +82,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
                 break;
             case "end":
                 handleEnd(jsonMessage);
+                break;
             default:
                 LOGGER.log(Level.WARNING, "Received an message without a type");
         }
