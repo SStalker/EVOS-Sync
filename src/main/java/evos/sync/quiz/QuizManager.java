@@ -39,7 +39,7 @@ public class QuizManager {
     private final Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
 
     @Inject
-    private Database database = new Database();
+    private Database database ;
 
     /**
      * Starts a quiz with the given quizId of the User with the given userId.
