@@ -317,9 +317,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         List<Session> attendees = quiz.getAttendeeList();
         JsonObjectBuilder response = Json.createObjectBuilder();
         response.add("type", "end");
+        String responseString = response.build().toString();
+
         for (Session attendee : attendees) {
             try {
-                attendee.getBasicRemote().sendText(response.build().toString());
+                attendee.getBasicRemote().sendText(responseString);
             } catch (IOException ex) {
                 Logger.getLogger(SyncMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -327,7 +329,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         
         // now we remote the Quiz fro the QuizManager
         quizManager.endQuiz(quizId, sessionString);
-        sendResponse(response.build().toString());
+        sendResponse(responseString);
     }
 
     /**
