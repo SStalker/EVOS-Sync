@@ -58,6 +58,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
      */
     @Override
     public void onMessage(String message) {
+        System.out.println("MESSAGE: " + message);
         JsonObject jsonMessage = Json.createReader(new StringReader(message)).readObject();
         String messageType = "";
         try {
