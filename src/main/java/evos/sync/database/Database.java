@@ -37,7 +37,7 @@ import javax.inject.Singleton;
 public class Database {
 
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
-    private String host = "evos";
+    private String host = "localhost";
     private int port = 3306;
     private String user = "evos";
     private String password = "evos";
@@ -49,7 +49,7 @@ public class Database {
             databaseProperties.load(databasePropertiesStream);
 
             host = databaseProperties.getProperty("host");
-            port = Integer.parseInt(databaseProperties.getProperty("post"));
+            port = Integer.parseInt(databaseProperties.getProperty("port"));
             user = databaseProperties.getProperty("user");
             password = databaseProperties.getProperty("password");
             timezone = databaseProperties.getProperty("timezone");
@@ -63,7 +63,6 @@ public class Database {
 
     public boolean isOwner(int quizId, int userId) {
         Connection connection = getConnection();
-
         String sql = "SELECT users.name"
                 + " FROM quizzes, categories, users"
                 + " WHERE quizzes.category_id = categories.id"
