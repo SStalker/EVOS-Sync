@@ -16,6 +16,7 @@
  */
 package evos.sync.server;
 
+import evos.sync.quiz.QuizManager;
 import javax.inject.Inject;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -33,12 +34,13 @@ public class SyncServer {
     
     @Inject
     private SyncMessageHandlerFactory syncMessageHandlerFactory;
+    
+    @Inject
+    private QuizManager quizManager;
 
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("Opened session: " + session.getId());
-        
-        System.out.println("HANDLER: " + syncMessageHandlerFactory);
 
         SyncMessageHandler messageHandler = syncMessageHandlerFactory.createSyncMessageHandler(session);
         session.addMessageHandler(messageHandler);
@@ -47,6 +49,7 @@ public class SyncServer {
     @OnClose
     public void onClose(Session session) {
         System.out.println("Closed Session:" + session.getId());
+        quizManager.userDisconnected(session);
     }
 
     @OnError

@@ -17,11 +17,16 @@
 package evos.sync.quiz;
 
 import evos.sync.database.Database;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.websocket.Session;
 
 /**
@@ -38,8 +43,14 @@ public class QuizManager {
      */
     private final Map<Integer, Quiz> activeQuizzes = Collections.synchronizedMap(new HashMap<Integer, Quiz>());
 
+    /**
+     * Contains a list of session as the key value and it's corresponding
+     * quizzes it attends to.
+     */
+    private final Map<Session, Quiz> sessions = Collections.synchronizedMap(new HashMap<Session, Quiz>());
+
     @Inject
-    private Database database ;
+    private Database database;
 
     /**
      * Starts a quiz with the given quizId of the User with the given userId.
@@ -95,8 +106,16 @@ public class QuizManager {
         }
 
         quiz.addAttendee(attendeeSession);
+        sessions.put(attendeeSession, quiz);
     }
 
+    /**
+     * Returns an active quiz.
+     *
+     * @param quizId Quiz' id
+     * @return the wanted active Quiz object.
+     * @throws IllegalArgumentException
+     */
     public Quiz getQuiz(int quizId) throws IllegalArgumentException {
         Quiz quiz = activeQuizzes.get(quizId);
 
@@ -105,5 +124,28 @@ public class QuizManager {
         }
 
         return quiz;
+    }
+
+    /**
+     * Informs the User of a Quiz that a User disconnected. It also removes the
+     * given Session from the session's list.
+     *
+     * @param session disconnecting session
+     */
+    public void userDisconnected(Session session) {
+        Quiz quiz = sessions.get(session);
+
+        if (quiz != null) {
+            JsonObjectBuilder response = Json.createObjectBuilder();
+            response.add("type", "disconnect");
+
+            try {
+                quiz.getSession().getBasicRemote().sendText(response.build().toString());
+            } catch (IOException ex) {
+                Logger.getLogger(QuizManager.class.getName()).log(Level.SEVERE, "Could not inform the User of a session disconnection.", ex);
+            }
+
+            sessions.remove(session);
+        }
     }
 }
