@@ -103,3 +103,9 @@ Server -> User
 {
     type: 'end'
 }
+
+// Will be send to the User if a client unexpectedly loses connection.
+Server -> User
+{
+    type: 'disconnect'
+}
