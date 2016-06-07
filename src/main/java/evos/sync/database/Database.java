@@ -36,36 +36,34 @@ import javax.inject.Singleton;
 @Singleton
 public class Database {
 
-    private Connection connection;
     private static final Logger LOGGER = Logger.getLogger(Database.class.getName());
+    private String host = "evos";
+    private int port = 3306;
+    private String user = "evos";
+    private String password = "evos";
+    private String timezone = "Europe/Berlin";
 
     public Database() {
         Properties databaseProperties = new Properties();
         try (InputStream databasePropertiesStream = this.getClass().getResourceAsStream("/database.properties")) {
             databaseProperties.load(databasePropertiesStream);
 
+            host = databaseProperties.getProperty("host");
+            port = Integer.parseInt(databaseProperties.getProperty("post"));
+            user = databaseProperties.getProperty("user");
+            password = databaseProperties.getProperty("password");
+            timezone = databaseProperties.getProperty("timezone");
+
             LOGGER.log(Level.INFO, "Successfully loaded database.properties file");
         } catch (NullPointerException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return;
+            LOGGER.log(Level.SEVERE, "Could not load database.properties file", ex);
         }
 
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            String connectionString = "jdbc:mysql://" + databaseProperties.getProperty("host")
-                    + ":" + databaseProperties.getProperty("port")
-                    + "/evos?user=" + databaseProperties.getProperty("user") + ""
-                    + "&password=" + databaseProperties.getProperty("password")
-                    + "&useSSL=false&serverTimezone=" + databaseProperties.getProperty("timezone");
-            connection = DriverManager.getConnection(connectionString);
-
-            LOGGER.log(Level.INFO, "Successfully loaded database");
-        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
     }
 
     public boolean isOwner(int quizId, int userId) {
+        Connection connection = getConnection();
+
         String sql = "SELECT users.name"
                 + " FROM quizzes, categories, users"
                 + " WHERE quizzes.category_id = categories.id"
@@ -78,15 +76,38 @@ public class Database {
             statement.setInt(1, userId);
             statement.setInt(2, quizId);
             ResultSet resultSet = statement.executeQuery();
-
-            // first() returns true if the cursor is on a valid ResultSet.
-            // It returns false if there are no rows in the ResultSet.
-            // TODO: Write unit test to test this
             return resultSet.first();
         } catch (SQLException ex) {
-            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
 
+        try {
+            connection.close();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
         return false;
+    }
+
+    /**
+     * Opens a connection to the database and returns it.
+     */
+    private Connection getConnection() {
+        try {
+            Connection connection;
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            String connectionString = "jdbc:mysql://" + host
+                    + ":" + port
+                    + "/evos?user=" + user + ""
+                    + "&password=" + password
+                    + "&useSSL=false&serverTimezone=" + timezone;
+            connection = DriverManager.getConnection(connectionString);
+
+            LOGGER.log(Level.INFO, "Successfully loaded database");
+            return connection;
+        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 }
