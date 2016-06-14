@@ -226,12 +226,7 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         String responseString = response.build().toString();
         synchronized (attendees) {
             for (Session attendee : attendees) {
-                try {
-                    attendee.getBasicRemote().sendText(responseString);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, "Could not send response to Attendee!");
-                    // TODO: Perhaps we should inform the User about this failure?
-                }
+                attendee.getAsyncRemote().sendText(responseString);
             }
         }
     }
