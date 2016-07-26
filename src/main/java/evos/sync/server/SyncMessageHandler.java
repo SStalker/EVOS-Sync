@@ -111,6 +111,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("start", msg));
             return;
+        } catch (ClassCastException ex) {
+            String msg = "received invalid class type (maybe String instead of int?)";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("start", msg));
+            return;
         }
 
         try {
@@ -147,6 +152,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             nickname = message.getString("nickname");
         } catch (NullPointerException ex) {
             String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("logon", msg));
+            return;
+        } catch (ClassCastException ex) {
+            String msg = "received invalid class type (maybe String instead of int?)";
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("logon", msg));
             return;
@@ -201,6 +211,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("question", msg));
             return;
+        } catch (ClassCastException ex) {
+            String msg = "received invalid class type (maybe String instead of int?)";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("question", msg));
+            return;
         }
 
         Quiz quiz;
@@ -251,6 +266,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("answer", msg));
             return;
+        } catch (ClassCastException ex) {
+            String msg = "received invalid class type (maybe String instead of int?)";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("answer", msg));
+            return;
         }
 
         Quiz quiz;
@@ -287,6 +307,11 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             sessionString = message.getString("session_id");
         } catch (NullPointerException ex) {
             String msg = "missing parameters in message";
+            LOGGER.log(Level.WARNING, msg, ex);
+            sendResponse(createErrorString("end", msg));
+            return;
+        } catch (ClassCastException ex) {
+            String msg = "received invalid class type (maybe String instead of int?)";
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("end", msg));
             return;
