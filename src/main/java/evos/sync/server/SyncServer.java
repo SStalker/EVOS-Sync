@@ -38,6 +38,11 @@ public class SyncServer {
     @Inject
     private QuizManager quizManager;
 
+    /**
+     * Creates a messageHandler for the session
+     * 
+     * @param session   The corresponding session.
+     */
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("Opened session: " + session.getId());
@@ -46,12 +51,22 @@ public class SyncServer {
         session.addMessageHandler(messageHandler);
     }
 
+    /**
+     * Removes the session from the session list of the quizManager
+     * 
+     * @param session   The corresponding session.
+     */
     @OnClose
     public void onClose(Session session) {
         System.out.println("Closed Session:" + session.getId());
         quizManager.userDisconnected(session);
     }
 
+    /**
+     * Prints an error message.
+     * 
+     * @param t     A throwable exception.
+     */
     @OnError
     public void onError(Throwable t) {
         System.err.println("An error occurred: " + t.getMessage());

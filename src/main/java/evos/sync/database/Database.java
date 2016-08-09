@@ -60,7 +60,14 @@ public class Database {
         }
 
     }
-
+    
+    /**
+     * Checks if the user is the owner of the quiz.
+     * 
+     * @param quizId    The quiz id.
+     * @param userId    The users id.
+     * @return 
+     */
     public boolean isOwner(int quizId, int userId) {
         Connection connection = getConnection();
         String sql = "SELECT users.name"

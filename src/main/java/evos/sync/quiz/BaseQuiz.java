@@ -28,10 +28,6 @@ import javax.websocket.Session;
  */
 public class BaseQuiz implements Quiz {
 
-    /*
-     * TODO: We may need to create setters for userSession and the
-     * userSessionString, if the User has a disconnection.
-     */
     private final int quizId;
     private Session userSession;
     private String userSessionString;
