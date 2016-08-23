@@ -35,7 +35,7 @@ import javax.websocket.Session;
 /**
  * This class handles the request for each session.
  *
- * @author Christian Wansart
+ * @author Christian Wansart, Lukas Hannigbrinck
  */
 public class SyncMessageHandler implements MessageHandler.Whole<String> {
 
@@ -146,10 +146,13 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
     private void handleLogon(JsonObject message) {
         int quizId;
         String nickname;
+        String attendeeSession;
 
         try {
             quizId = message.getInt("quiz_id");
             nickname = message.getString("nickname");
+            attendeeSession = message.getString("session_id");
+            
         } catch (NullPointerException ex) {
             String msg = "missing parameters in message";
             LOGGER.log(Level.WARNING, msg, ex);
@@ -162,15 +165,18 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
             return;
         }
 
-        Quiz quiz;
+        Quiz quiz = null;
+        boolean toSignIn = true;
         try {
-            quizManager.signUp(quizId, nickname, this.userSession);
+            quizManager.signUp(quizId, nickname, this.userSession, attendeeSession);
             quiz = quizManager.getQuiz(quizId);
         } catch (IllegalArgumentException ex) {
             String msg = "quiz is not active";
             LOGGER.log(Level.WARNING, msg, ex);
             sendResponse(createErrorString("logon", msg));
             return;
+        } catch (AttendeeAlreadySignedIn ex){
+            toSignIn = false;
         }
 
         // Inform Attendee about successful logon
@@ -179,15 +185,18 @@ public class SyncMessageHandler implements MessageHandler.Whole<String> {
         response.add("successful", true);
         sendResponse(response.build().toString());
 
-        // Inform User about new Attendee
-        Session userSession = quiz.getSession();
-        response = Json.createObjectBuilder();
-        response.add("type", "logon");
-        response.add("nickname", nickname);
-        try {
-            userSession.getBasicRemote().sendText(response.build().toString());
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Could not send response to User!");
+        if(toSignIn){
+            // Inform User about new Attendee
+            Session userSession = quiz.getSession();
+            response = Json.createObjectBuilder();
+            response.add("type", "logon");
+            response.add("nickname", nickname);
+        
+            try {
+                userSession.getBasicRemote().sendText(response.build().toString());
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, "Could not send response to User!");
+            }
         }
     }
 

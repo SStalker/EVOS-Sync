@@ -17,9 +17,12 @@
 package evos.sync.quiz;
 
 import evos.sync.database.Database;
+import evos.sync.server.AttendeeAlreadySignedIn;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +35,7 @@ import javax.websocket.Session;
 /**
  * This class manages the active quizzes.
  *
- * @author Christian Wansart
+ * @author Christian Wansart, Lukas Hannigbrinck
  */
 @Singleton
 public class QuizManager {
@@ -49,6 +52,11 @@ public class QuizManager {
      */
     private final Map<Session, Quiz> sessions = Collections.synchronizedMap(new HashMap<Session, Quiz>());
 
+    /**
+     * Contains all php session ids from all logged on attendees.
+     */
+    private final Map<Quiz, List<String>> attendeeSessionStringList = Collections.synchronizedMap(new HashMap<Quiz, List<String>>());
+    
     @Inject
     private Database database;
 
@@ -71,6 +79,7 @@ public class QuizManager {
         }
 
         activeQuizzes.put(quizId, quiz);
+        attendeeSessionStringList.put(quiz, Collections.synchronizedList(new ArrayList<String>()) );
     }
 
     /**
@@ -88,6 +97,7 @@ public class QuizManager {
         }
 
         this.activeQuizzes.remove(quizId);
+        attendeeSessionStringList.remove(quiz);
     }
 
     /**
@@ -96,17 +106,24 @@ public class QuizManager {
      * @param quizId Quiz's id
      * @param nickname Attendee's nickname
      * @param attendeeSession Attendees Session
+     * @param attendeeSessionString PHP Session (Needed for reconnect purpose)
      * @throws IllegalArgumentException if the given Quiz is not active
      */
-    public void signUp(int quizId, String nickname, Session attendeeSession) throws IllegalArgumentException {
+    public void signUp(int quizId, String nickname, Session attendeeSession, String attendeeSessionString) throws IllegalArgumentException, AttendeeAlreadySignedIn {
         Quiz quiz = activeQuizzes.get(quizId);
 
         if (quiz == null) {
             throw new IllegalArgumentException("given Quiz is not active");
         }
-
+        
         quiz.addAttendee(attendeeSession);
         sessions.put(attendeeSession, quiz);
+        
+        if(attendeeSessionStringList.get(quiz).contains(attendeeSessionString)){
+            throw new AttendeeAlreadySignedIn();
+        }else{
+            attendeeSessionStringList.get(quiz).add(attendeeSessionString);
+        }
     }
 
     /**
